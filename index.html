@@ -123,46 +123,111 @@
       max-width: 90vw;
       pointer-events: none;
     }
+
+    /* 🔥 ENHANCED MOBILE D-PAD CONTROLS */
     .mobile-controls {
-      position: absolute;
+      position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: none;
-      gap: 10px;
       z-index: 150;
       pointer-events: all;
     }
+    .dpad {
+      display: grid;
+      grid-template-areas: 
+        ". up ."
+        "left center right"
+        ". down .";
+      grid-template-columns: 1fr 72px 1fr;
+      grid-template-rows: 1fr 72px 1fr;
+      gap: 8px;
+      width: 200px;
+      height: 200px;
+      padding: 20px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
     .mobile-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+      border: 2px solid rgba(255,255,255,0.25);
       color: white;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.2s;
+      backdrop-filter: blur(15px);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+    }
+    .mobile-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    .mobile-btn:active::before {
+      left: 100%;
     }
     .mobile-btn:active {
-      background: rgba(255,255,255,0.3);
-      transform: scale(0.95);
+      transform: scale(0.92) translateZ(0);
+      background: linear-gradient(145deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15));
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 
+        0 8px 25px rgba(255,255,255,0.2),
+        inset 0 2px 4px rgba(255,255,255,0.1);
     }
+    
+    #up { grid-area: up; height: 72px; width: 72px; }
+    #left { grid-area: left; height: 72px; width: 72px; }
+    #right { grid-area: right; height: 72px; width: 72px; }
+    #down { grid-area: down; height: 72px; width: 72px; }
+    #center { 
+      grid-area: center; 
+      background: rgba(76,175,80,0.2) !important;
+      border-color: rgba(76,175,80,0.5) !important;
+      font-size: 1.8rem;
+      pointer-events: none;
+    }
+
     @media (max-width: 768px) {
       body { justify-content: flex-start; padding-top: 20px; }
       h1 { margin-bottom: 12px; }
       .game-container { width: 95vw; height: 95vw; max-width: 400px; max-height: 400px; }
-      .mobile-controls { display: flex; }
+      .mobile-controls { display: block; }
       .controls { display: none; }
+      .dpad { width: 240px; height: 240px; padding: 24px; }
+      .mobile-btn { font-size: 1.8rem; }
+    }
+    @media (max-width: 480px) {
+      .dpad { width: 220px; height: 220px; padding: 20px; }
     }
     @media (orientation: landscape) and (max-height: 500px) {
       body { flex-direction: row; padding: 20px; }
       .game-container { width: 70vh; height: 70vh; }
       h1 { margin-bottom: 0; margin-right: 20px; writing-mode: vertical-rl; }
-      .controls { margin-top: 0; margin-left: 20px; writing-mode: vertical-rl; }
+      .mobile-controls { 
+        position: absolute; 
+        bottom: 20px; 
+        right: 20px; 
+        left: auto; 
+        transform: none;
+      }
+      .controls { display: none !important; }
     }
   </style>
 </head>
@@ -176,16 +241,21 @@
       <p>Your score: <strong id="finalScore">0</strong></p>
       <button id="restartBtn">▶️ Play Again</button>
     </div>
-    <div class="mobile-controls">
-      <button class="mobile-btn" id="up">↑</button>
-      <button class="mobile-btn" id="left">←</button>
-      <button class="mobile-btn" id="down">↓</button>
-      <button class="mobile-btn" id="right">→</button>
-    </div>
   </div>
   <div class="controls">
     Swipe or Arrows / WASD<br>
     <small>Score +1 per food 🟢</small>
+  </div>
+
+  <!-- 🔥 UPGRADED D-PAD CONTROLS -->
+  <div class="mobile-controls">
+    <div class="dpad">
+      <button class="mobile-btn" id="up">↑</button>
+      <button class="mobile-btn" id="left">←</button>
+      <button class="mobile-btn" id="center">🐍</button>
+      <button class="mobile-btn" id="right">→</button>
+      <button class="mobile-btn" id="down">↓</button>
+    </div>
   </div>
 
   <script>
@@ -239,7 +309,7 @@
       gameOverScreen.style.display = 'none';
       gameRunning = true;
       if (gameLoop) clearInterval(gameLoop);
-      gameLoop = setInterval(draw, Math.max(80, 150 - score * 2)); // Speed up with score
+      gameLoop = setInterval(draw, Math.max(80, 150 - score * 2));
     }
 
     function draw() {
@@ -247,7 +317,6 @@
 
       const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-      // Collisions
       if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount ||
           snake.some((s, i) => i > 0 && s.x === head.x && s.y === head.y)) {
         endGame();
@@ -264,11 +333,9 @@
         snake.pop();
       }
 
-      // Clear
       ctx.fillStyle = '#1a1a1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Grid subtle
       ctx.strokeStyle = 'rgba(255,255,255,0.05)';
       ctx.lineWidth = 1;
       for (let i = 0; i <= tileCount; i++) {
@@ -282,7 +349,6 @@
         ctx.stroke();
       }
 
-      // Food - glowing
       const fx = food.x * gridSize + gridSize / 2;
       const fy = food.y * gridSize + gridSize / 2;
       const r = gridSize / 2 - 1;
@@ -295,7 +361,6 @@
       ctx.arc(fx, fy, r, 0, Math.PI * 2);
       ctx.fill();
 
-      // Snake - gradient segments
       snake.forEach((part, i) => {
         const sx = part.x * gridSize + 2;
         const sy = part.y * gridSize + 2;
@@ -369,11 +434,23 @@
       if (!gameRunning) init();
     }, { passive: false });
 
-    // Mobile buttons
-    document.getElementById('up').addEventListener('touchstart', e => { e.preventDefault(); changeDirection(0, -1); });
-    document.getElementById('down').addEventListener('touchstart', e => { e.preventDefault(); changeDirection(0, 1); });
-    document.getElementById('left').addEventListener('touchstart', e => { e.preventDefault(); changeDirection(-1, 0); });
-    document.getElementById('right').addEventListener('touchstart', e => { e.preventDefault(); changeDirection(1, 0); });
+    // 🔥 ENHANCED MOBILE D-PAD BUTTONS
+    document.getElementById('up').addEventListener('touchstart', e => { 
+      e.preventDefault(); 
+      changeDirection(0, -1); 
+    }, { passive: false });
+    document.getElementById('down').addEventListener('touchstart', e => { 
+      e.preventDefault(); 
+      changeDirection(0, 1); 
+    }, { passive: false });
+    document.getElementById('left').addEventListener('touchstart', e => { 
+      e.preventDefault(); 
+      changeDirection(-1, 0); 
+    }, { passive: false });
+    document.getElementById('right').addEventListener('touchstart', e => { 
+      e.preventDefault(); 
+      changeDirection(1, 0); 
+    }, { passive: false });
 
     // Click canvas to start
     canvas.addEventListener('click', () => { if (!gameRunning) init(); });
