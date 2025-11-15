@@ -6,7 +6,6 @@
   <title>Snake Game - gamesnakes.io</title>
 
   <!-- GOOGLE ANALYTICS (G-W0K7WTGBQ1) -->
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0K7WTGBQ1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -21,7 +20,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
       background: #121212;
       color: #eee;
@@ -29,9 +28,10 @@
       user-select: none;
       touch-action: none;
       overflow: hidden;
+      padding-top: env(safe-area-inset-top, 20px);
     }
     h1 { 
-      margin-bottom: 12px; 
+      margin-bottom: 8px; 
       font-size: clamp(1.5rem, 5vw, 2.5rem); 
       text-align: center; 
       z-index: 1000;
@@ -40,41 +40,53 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 8px;
       width: 100%;
       max-width: min(90vw, 500px);
     }
     .score {
-      font-size: clamp(1.2rem, 5vw, 1.6rem);
+      font-size: clamp(1.1rem, 4.5vw, 1.5rem);
       font-weight: 700;
       color: #4caf50;
       text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 20px #4caf50;
       background: rgba(18,18,18,0.9);
-      padding: 12px 24px;
-      border-radius: 16px;
+      padding: 10px 20px;
+      border-radius: 14px;
       backdrop-filter: blur(15px);
       border: 2px solid rgba(76,175,80,0.4);
-      box-shadow: 0 8px 32px rgba(76,175,80,0.3);
+      box-shadow: 0 6px 25px rgba(76,175,80,0.3);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s ease;
     }
     .score.visible { opacity: 1; }
+
+    /* GAME BOARD + CONTROLS CONTAINER */
+    .game-wrapper {
+      position: relative;
+      width: min(90vw, 500px);
+      max-width: 500px;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
     .game-container {
       position: relative;
-      width: min(90vw, 90vh, 500px);
-      height: min(90vw, 90vh, 500px);
-      aspect-ratio: 1;
+      width: 100%;
+      height: 0;
+      padding-bottom: 100%; /* Perfect square */
       border: 4px solid #333;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 12px 40px rgba(0,0,0,0.6);
       background: #1e1e1e;
-      margin: 0 auto;
+      flex-shrink: 0;
     }
     canvas { 
-      display: block; 
+      position: absolute;
+      top: 0; left: 0;
       width: 100%; 
       height: 100%; 
       image-rendering: pixelated; 
@@ -93,24 +105,24 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 24px;
+      gap: 20px;
       z-index: 200;
       animation: fadeIn 0.5s ease-out;
     }
     .start-screen h2 {
-      font-size: clamp(2rem, 8vw, 3rem);
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
       color: #4caf50;
       text-shadow: 0 0 30px #4caf50;
       margin: 0;
     }
     .start-screen p {
-      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-size: clamp(0.9rem, 3.5vw, 1.1rem);
       color: #aaa;
       text-align: center;
       max-width: 80%;
     }
 
-    /* GAME OVER SCREEN */
+    /* GAME OVER */
     .game-over {
       position: absolute;
       top: 50%;
@@ -118,16 +130,16 @@
       transform: translate(-50%, -50%);
       background: rgba(0,0,0,0.95);
       backdrop-filter: blur(20px);
-      padding: 32px 40px;
+      padding: 28px 36px;
       border-radius: 20px;
       text-align: center;
       display: none;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.9);
       z-index: 200;
       border: 2px solid #333;
-      max-width: 90%;
+      max-width: 85%;
       animation: fadeIn 0.3s ease-out;
     }
     @keyframes fadeIn {
@@ -137,12 +149,12 @@
     .game-over h2 { 
       color: #ff5252; 
       margin: 0;
-      font-size: clamp(1.4rem, 6vw, 2.2rem);
+      font-size: clamp(1.3rem, 5.5vw, 2rem);
       text-shadow: 0 2px 8px rgba(255,82,82,0.5);
     }
     .game-over p { 
-      margin: 0 0 16px 0; 
-      font-size: 1.1rem;
+      margin: 0 0 14px 0; 
+      font-size: 1rem;
     }
 
     /* BUTTONS */
@@ -150,8 +162,8 @@
       background: linear-gradient(145deg, #4caf50, #45a049);
       color: white;
       border: none;
-      padding: 18px 36px;
-      font-size: clamp(1.1rem, 5vw, 1.4rem);
+      padding: 16px 32px;
+      font-size: clamp(1rem, 4.5vw, 1.3rem);
       font-weight: 600;
       border-radius: 16px;
       cursor: pointer;
@@ -162,33 +174,34 @@
       -webkit-tap-highlight-color: transparent;
       position: relative;
       z-index: 201;
-      min-width: 180px;
+      min-width: 160px;
     }
     button:hover, button:active { 
       background: linear-gradient(145deg, #45a049, #3d8b40);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
       box-shadow: 0 12px 30px rgba(76,175,80,0.7);
     }
     button:active { transform: translateY(0); }
 
     .controls { 
-      margin-top: 16px; 
-      font-size: clamp(0.8rem, 3vw, 1rem); 
+      margin-top: 12px; 
+      font-size: clamp(0.75rem, 3vw, 0.95rem); 
       color: #aaa; 
       text-align: center;
       max-width: 90vw;
       pointer-events: none;
     }
 
-    /* D-PAD */
+    /* D-PAD INSIDE GAME BOARD */
     .mobile-controls {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
       display: none;
       z-index: 150;
       pointer-events: all;
+      padding: 8px;
     }
     .dpad {
       display: grid;
@@ -196,29 +209,30 @@
         ". up ."
         "left center right"
         ". down .";
-      grid-template-columns: 1fr 72px 1fr;
-      grid-template-rows: 1fr 72px 1fr;
-      gap: 8px;
-      width: 200px;
-      height: 200px;
-      padding: 20px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      border: 2px solid rgba(255,255,255,0.2);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      grid-template-columns: 1fr 60px 1fr;
+      grid-template-rows: 1fr 60px 1fr;
+      gap: 6px;
+      width: 100%;
+      max-width: 220px;
+      margin: 0 auto;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(18px);
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      padding: 12px;
     }
     .mobile-btn {
-      border-radius: 20px;
-      background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
-      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 2px solid rgba(255,255,255,0.2);
       color: white;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(15px);
+      backdrop-filter: blur(12px);
       transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -233,15 +247,15 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
       transition: left 0.5s;
     }
     .mobile-btn:active::before { left: 100%; }
     .mobile-btn:active {
-      transform: scale(0.92);
-      background: linear-gradient(145deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15));
-      border-color: rgba(255,255,255,0.5);
-      box-shadow: 0 8px 25px rgba(255,255,255,0.2), inset 0 2px 4px rgba(255,255,255,0.1);
+      transform: scale(0.93);
+      background: linear-gradient(145deg, rgba(255,255,255,0.28), rgba(255,255,255,0.12));
+      border-color: rgba(255,255,255,0.4);
+      box-shadow: 0 6px 20px rgba(255,255,255,0.15), inset 0 2px 4px rgba(255,255,255,0.08);
     }
     #up { grid-area: up; }
     #left { grid-area: left; }
@@ -249,32 +263,33 @@
     #down { grid-area: down; }
     #center { 
       grid-area: center; 
-      background: rgba(76,175,80,0.2) !important;
-      border-color: rgba(76,175,80,0.5) !important;
-      font-size: 1.8rem;
+      background: rgba(76,175,80,0.18) !important;
+      border-color: rgba(76,175,80,0.4) !important;
+      font-size: 1.7rem;
       pointer-events: none;
     }
 
     @media (max-width: 768px) {
-      body { justify-content: flex-start; padding-top: 20px; }
-      h1 { margin-bottom: 8px; }
-      .header { margin-bottom: 12px; }
-      .game-container { width: 95vw; height: 95vw; max-width: 400px; max-height: 400px; }
+      body { padding-top: max(env(safe-area-inset-top), 20px); }
+      .header { margin-bottom: 6px; }
+      .game-wrapper { width: 95vw; }
       .mobile-controls { display: block; }
       .controls { display: none; }
-      .dpad { width: 240px; height: 240px; padding: 24px; }
-      .mobile-btn { font-size: 1.8rem; }
+      .dpad { max-width: 200px; padding: 10px; }
+      .mobile-btn { font-size: 1.4rem; }
     }
     @media (max-width: 480px) {
-      .dpad { width: 220px; height: 220px; padding: 20px; }
+      .dpad { max-width: 180px; padding: 8px; }
+      .mobile-btn { font-size: 1.3rem; }
     }
     @media (orientation: landscape) and (max-height: 500px) {
-      body { flex-direction: row; padding: 20px; align-items: center; }
-      .game-container { width: 70vh; height: 70vh; }
-      h1 { margin-bottom: 0; margin-right: 20px; writing-mode: vertical-rl; }
-      .header { margin-bottom: 0; margin-right: 20px; }
+      body { flex-direction: row; padding: 10px; align-items: center; gap: 16px; }
+      .game-wrapper { width: 65vh; max-width: none; }
+      .game-container { padding-bottom: 65vh; }
+      h1 { margin: 0; writing-mode: vertical-rl; }
+      .header { margin: 0; gap: 8px; }
       .score { writing-mode: vertical-rl; text-orientation: mixed; }
-      .mobile-controls { bottom: 20px; right: 20px; left: auto; transform: none; }
+      .mobile-controls { bottom: 6px; left: 6px; right: 6px; }
       .controls { display: none !important; }
     }
   </style>
@@ -284,46 +299,46 @@
     <h1>Snake</h1>
     <div class="score" id="scoreDisplay">Score: <span id="score">0</span></div>
   </div>
-  <div class="game-container">
-    <canvas id="gameCanvas"></canvas>
 
-    <!-- START SCREEN -->
-    <div class="start-screen" id="startScreen">
-      <h2>Snake Game</h2>
-      <p>Use arrows, WASD, or swipe to move<br>Eat food to grow!</p>
-      <button id="playBtn">Play</button>
-    </div>
+  <div class="game-wrapper">
+    <div class="game-container">
+      <canvas id="gameCanvas"></canvas>
 
-    <!-- GAME OVER SCREEN -->
-    <div class="game-over" id="gameOver">
-      <h2>Game Over!</h2>
-      <p>Your score: <strong id="finalScore">0</strong></p>
-      <button id="restartBtn">Play Again</button>
+      <!-- START SCREEN -->
+      <div class="start-screen" id="startScreen">
+        <h2>Snake Game</h2>
+        <p>Use arrows, WASD, or swipe to move<br>Eat food to grow!</p>
+        <button id="playBtn">Play</button>
+      </div>
+
+      <!-- GAME OVER -->
+      <div class="game-over" id="gameOver">
+        <h2>Game Over!</h2>
+        <p>Your score: <strong id="finalScore">0</strong></p>
+        <button id="restartBtn">Play Again</button>
+      </div>
+
+      <!-- D-PAD INSIDE BOARD -->
+      <div class="mobile-controls">
+        <div class="dpad">
+          <button class="mobile-btn" id="up">Up</button>
+          <button class="mobile-btn" id="left">Left</button>
+          <button class="mobile-btn" id="center">Snake</button>
+          <button class="mobile-btn" id="right">Right</button>
+          <button class="mobile-btn" id="down">Down</button>
+        </div>
+      </div>
     </div>
   </div>
+
   <div class="controls">
     Swipe or Arrows / WASD<br>
     <small>Score +1 per food</small>
   </div>
 
-  <!-- D-PAD -->
-  <div class="mobile-controls">
-    <div class="dpad">
-      <button class="mobile-btn" id="up">Up</button>
-      <button class="mobile-btn" id="left">Left</button>
-      <button class="mobile-btn" id="center">Snake</button>
-      <button class="mobile-btn" id="right">Right</button>
-      <button class="mobile-btn" id="down">Down</button>
-    </div>
-  </div>
-
   <script>
-    // Google Analytics Events
     function trackEvent(action, label = '') {
-      gtag('event', action, {
-        'event_category': 'Game',
-        'event_label': label
-      });
+      gtag('event', action, { 'event_category': 'Game', 'event_label': label });
     }
 
     const canvas = document.getElementById('gameCanvas');
@@ -336,9 +351,9 @@
     const playBtn = document.getElementById('playBtn');
     const restartBtn = document.getElementById('restartBtn');
 
-    // Responsive canvas
     function resizeCanvas() {
-      const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7, 500);
+      const wrapper = document.querySelector('.game-container');
+      const size = wrapper.offsetWidth;
       canvas.width = size;
       canvas.height = size;
     }
@@ -396,21 +411,16 @@
       }
 
       const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-
       if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-        endGame();
-        return;
+        endGame(); return;
       }
-
       for (let i = 1; i < snake.length; i++) {
         if (snake[i].x === head.x && snake[i].y === head.y) {
-          endGame();
-          return;
+          endGame(); return;
         }
       }
 
       snake.unshift(head);
-
       if (head.x === food.x && head.y === food.y) {
         score++;
         scoreEl.textContent = score;
@@ -469,23 +479,14 @@
       if (gameRunning) pendingDirection = { dx: newDx, dy: newDy };
     }
 
-    // PLAY BUTTON
-    function startGame() {
-      trackEvent('button_click', 'play');
-      init();
-    }
+    function startGame() { trackEvent('button_click', 'play'); init(); }
+    function restartGame() { trackEvent('button_click', 'play_  again'); init(); }
+
     playBtn.addEventListener('click', startGame);
     playBtn.addEventListener('touchstart', e => { e.preventDefault(); startGame(); }, { passive: false });
-
-    // RESTART BUTTON
-    function restartGame() {
-      trackEvent('button_click', 'play_again');
-      init();
-    }
     restartBtn.addEventListener('click', restartGame);
     restartBtn.addEventListener('touchstart', e => { e.preventDefault(); restartGame(); }, { passive: false });
 
-    // Controls
     document.addEventListener('keydown', e => {
       e.preventDefault();
       const k = e.key.toLowerCase();
@@ -512,21 +513,18 @@
       else if (Math.abs(dy) > 30) queueDirection(0, dy > 0 ? 1 : -1);
     }, { passive: false });
 
-    // D-PAD
     document.getElementById('up').addEventListener('touchstart', e => { e.preventDefault(); queueDirection(0, -1); }, { passive: false });
     document.getElementById('down').addEventListener('touchstart', e => { e.preventDefault(); queueDirection(0, 1); }, { passive: false });
     document.getElementById('left').addEventListener('touchstart', e => { e.preventDefault(); queueDirection(-1, 0); }, { passive: false });
     document.getElementById('right').addEventListener('touchstart', e => { e.preventDefault(); queueDirection(1, 0); }, { passive: false });
 
-    canvas.addEventListener('click', () => { if (!gameRunning && !startScreen.style.display) init(); });
+    canvas.addEventListener('click', () => { if (!gameRunning && startScreen.style.display !== 'flex') init(); });
 
-    // Initial setup
     updateTileCount();
     food = generateFood();
     startScreen.style.display = 'flex';
     trackEvent('page_load');
 
-    // Prevent zoom
     let lastTouchEnd = 0;
     document.addEventListener('touchend', () => {
       const now = Date.now();
